@@ -4,7 +4,7 @@ LOG_DIR = "./logs" #Изменили путь (ранее использовал
 os.makedirs(LOG_DIR, exist_ok=True)
 
 logging.basicConfig(
-    level=logging.INFO,
+    level=logging.WARNING, # Изменили на WARNING, чтобы логгер пропускал ВСЕ уровни логов
     format="%(asctime)s [%(levelname)s] %(name)s: %(message)s",
     handlers=[
         logging.FileHandler(f"{LOG_DIR}/app.log"),

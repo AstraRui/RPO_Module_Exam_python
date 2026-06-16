@@ -1,4 +1,4 @@
-from fastapi import FastAPI, Depends
+from fastapi import FastAPI, Depends, HTTPException
 from sqlalchemy.orm import Session
 from database import engine, SessionLocal
 from core.logging_config import logger  
@@ -17,6 +17,7 @@ class Incident(Base):
 Base.metadata.create_all(bind=engine)
 
 app = FastAPI(title="NexusMonitor API")
+
 app.add_middleware(
     CORSMiddleware,
     allow_origins=["http://localhost:5173"],  
@@ -24,6 +25,7 @@ app.add_middleware(
     allow_methods=["*"],  
     allow_headers=["*"],  
 )
+
 def get_db():
     db = SessionLocal()
     try:
@@ -31,7 +33,20 @@ def get_db():
     finally:
         db.close()
 
-@app.get("/api/incidents")
+@app.get("/api/incidents") # Повеселись, но сделали логирование
 def get_incidents(db: Session = Depends(get_db)):
-    logger.info("Запрос списка инцидентов")
-    return {"status": "success", "data": []}
+    logger.debug("Получен запрос GET /api/incidents. Инициализация запроса к БД.")
+    
+    try:
+        incidents = db.query(Incident).all()
+        
+        if not incidents:
+            logger.warning("Запрос к БД выполнен успешно, но таблица incidents пуста.")
+            return {"status": "success", "data": []}
+            
+        logger.info(f"Успешно получено инцидентов из базы: {len(incidents)}")
+        return {"status": "success", "data": incidents}
+        
+    except Exception as e:
+        logger.error(f"Исключение при получении списка инцидентов: {str(e)}", exc_info=True)
+        raise HTTPException(status_code=500, detail="Внутренняя ошибка сервера")
