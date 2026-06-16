@@ -1,0 +1,20 @@
+# Бэкенд (Python)
+backend/__pycache__/
+backend/venv/
+backend/logs/*.log
+backend/.env
+
+# Фронтенд (Node / Vite)
+frontend/node_modules/
+frontend/dist/
+frontend/.env
+
+# Кэш Python и виртуальные окружения (если появятся в других местах)
+*.py[cod]
+*$py.class
+venv/
+.venv/
+ENV/
+
+# Логи
+*.log
